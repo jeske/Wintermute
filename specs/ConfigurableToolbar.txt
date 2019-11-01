@@ -1,0 +1,107 @@
+The deliverable for this project is the Java source for the 
+classes needed to implement a Swing UI Toolbar Component.
+
+This component should "feel" significantly like the IE 6.0 
+configurable toolbar. It should look like the Sun Java Metal
+ theme. 
+
+Here are some of the specific features we need:
+
+- The component is a "ToolbarContainer" which contains 
+  several individual "Toolbars".
+- The layout of these toolbars should be lockable/unlockable
+- When unlocked, there should be drag bars on the left of
+  each toolbar which allow the toolbar to be dragged around
+  the ToolbarContainer -- just like in IE's toolbarcontainer
+  NOTE: the toolbars should NOT drag out of the toolbarcontainer
+  into an undocked window. They should remain in the container.
+- The layout should be considered a set of horizontal slots.
+  The tallest toolbar in a slot dictates the height of the slot.
+  Other smaller toolbars in that same horitontal slot should be
+  vertically centered within the space available.
+- If the toolbar is at the left edge, dragging horizontally
+  will have no effect until the handle is dragged right to the 
+  next Toolbar's grab bar, at which time the position of the
+  two toolbars should switch.  (see IE)
+- If the toolbar is NOT at the left edge, dragging horizontally
+  should affect the location of the toolbar left edge
+  (and thus the size) of that toolbar.
+  If there is a toolbar to the right, then when the dragged
+  toolbar reaches it's minimum size, it should begin to "push"
+  the left edge of the next toolbar to the right also. When
+  a toolbar reaches it's minimum size at the right edge,
+  it should stop dragging. (see IE)
+- If the toolbar is dragged vertically down, it should be inserted
+  into the next horizontal slot at a horizontal position appropriate
+  to the mouse position. 
+- If the toolbar is dragged vertically down below any of the existing
+  horizontal slots, a new horizontal slot should be created which
+  contains only that toolbar.
+- OverflowItems: When a toolbar is partially obscured
+  (either by a toolbar to it's right, or by the right edge of the
+  window), a button should appear to provide access to the rest of 
+  the items in the toolbar. (see IE's ">>" button)
+- The last toolbar on a line should have it's size set to fill
+  the remaining size on the line. Components inside the
+  toolbar which are designed to expand to fill available
+  space should do so (such as a textfield).
+- Minimal border lines should be drawn BETWEEN the toolbars to
+  separate them. The Toolbars themselves should NOT each have
+  individual borders, as this will result in extra double borders
+  between them.
+- Right-clicking on an inactive area in any toolbar should bring
+  up a menu which allows you to (a) turn off any of the toolbars,
+  (b) lock and unlock toolbars
+- If the size of the ToolbarContainer is shrunk (due to a window
+  resize for example) to obscure the minimum size of toolbar, 
+  the toolbar should be "temporarily" moved to the left to remain
+  visible. If there is not enough room on a line for this 
+  movement to allow the toolbars to be visible, they should "wrap"
+  to a new toolbar line below. This new location should NOT become 
+  part of it's saved location. When the ToolbarContainer is resized
+  larger (due to a window resize), then the toolbars should return
+  to their original positions. 
+
+  The minmum size of a toolbar includes a preset number of pixels
+  (MIN_SIZE), plus the size required for the "OverflowItems" button.
+
+The implementation must be useful as a general purpose component.
+ Here are some implementation requirements:
+
+- A toolbar should accept any JComponent (we will add
+  a combination of buttons, textfields, and menus)
+  When buttons are added, they should automatically be 
+  set to eliminate their permanent border and turn on rollover 
+  borders.
+- A toolbar should accept any Action object. It should
+  automatically turn this into an image button on the toolbar,
+  or a button with image and text in the OverflowItems
+- The ToolbarContainer should have a mechanism for saving and 
+  loading the current layout state of the toolbars. The individual
+  toolbars should each have "identifier" strings, which should
+  default to the toolbar name if not provided. These identifier
+  strings are what will be used for the saving and loading.
+- Setup should NOT require custom subclasses of JFrame, or any of the
+  components inside the toolbar, to work correctly. Initialization
+  should be sufficiently like this:
+
+    JFrame frm = new JFrame();
+    ToolbarContainer tc = new ToolbarContainer();
+    tc.addToFrame(frm);
+
+    Toolbar tb_1 = new Toolbar("Navigation","NAV_ID_1");
+    tb_1.add(new JButton("Back"));
+    tb_1.add(new JButton("Forward"));
+    tc.add(tb_1);
+
+    Toolbar tb_2 = new Toolbar("Email");
+    tb_2.add(new JButton("Reply"));
+    tb_2.add(new JButton("Reply All"));
+
+- The implementation should be based on standard classes when 
+  possible. This will only make the implementation easier. For 
+  example, each horizontal slot might be a JPanel using a 
+  horizontal BoxLayout. Each Toolbar might be a JPanel with
+  a border layout with the "grab button" conditionally added
+  to the WEST/LEFT position when visible.
+

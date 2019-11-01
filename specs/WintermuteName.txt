@@ -1,0 +1,61 @@
+Usages studies conducted on both email client usage
+(such as Outlook, Eudora) and Internet Browser
+bookmark usage suggest that 85% of users do not
+organize their saved information. Manual efforts to
+categorize information on the Internet have given way
+to automatic indexing and text-search methods such as
+Google, AltaVista.
+
+The goal of this tool is to enhance the ability for
+users to find and use their information. This enhamcent
+comes in the form of text-search indexing and 
+automatically created links between items (such 
+as between emails and calendar events, contacts 
+and emails, etc.).
+
+The first release of this tool looks sufficiently like
+existing email tools such as Outlook and Eudora. 
+However, there are several organization features which
+help the user find things quickly. For example, there
+is a single search box which can be used to quickly
+find any type of item in the system. No existing mail
+client has full-text search over all email messages.
+
+A plug-in architecture allows additional components
+to be built into the same system. It is also possible
+to talk to the same single set of data from within
+other applications. For example, in Internet Explorer,
+when you visit a website, you could show contacts or
+emails which reference that website directly in the
+IE toolbar.
+
+The initial target user for this application is the
+power email user. That is, someone who receives 
+upwards of 50 email messages per day, is on a few 
+email mailing lists, who uses their email from
+multiple locations, and who stores all email for
+future reference and use.  
+
+In the future, all information workers will be
+target users, particularly those in a business
+environment.
+
+Qualities we would like to invoke with our 
+product name include:
+
+- fast / expedient / efficiency
+- stable
+- flexible
+
+Concepts which might be used to center the name
+include:
+
+- automatic organization 
+- (information) absorbtion 
+- (information) relationships
+- follow connections (between items)
+- email management
+- personal information management
+- (information) embedding
+- (information) context
+

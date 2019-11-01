@@ -1,0 +1,745 @@
+
+
+------ QUESTIONS ----------------------------------------------
+
+Q: Should column size and ordering be shared by all users of that columnset?
+   A: probably. Which means we should actually reorder the relation and set
+      the "size" properties of the columns.  (this will fix sort order arrows)
+Q: How do we make a "clonable" subtree of GUI related items. For example,
+   a "contacts GUI" should be a window, with subviews, and possible popup
+   frames or dialogs. When we want to create a new instance, we need to know
+   what to copy. (somewhat like "ownership" and "original authoring"??) 
+Q: How to do "Lotus Agenda" style "Direct Relation Entry". For example,
+   if we show a "Project" column in a table, I should be able to go there
+   and just type in the name of a project (with completion) to build the
+   relation. If I type a project name which does not exist, it would either
+   automatically create it, or ask me if I wanted to create it) When I do
+   this, am I editing a text-property of the item? or am I just using a
+   field editor which understands projects? 
+   A: I _think_ this should be a relation-aware field editor. It should
+      have pull-down capabilities for selecting from a list as well as 
+      text-completion. Maybe the column header should automatically show 
+      a <-> link icon if it's display data from a relation. Like Agenda,
+      the target's parent should define settings such as "auto-create"
+      and "indexed/unindexed". unindexed fields should not get pull-down
+      or unique support.
+
+   
+------ CRITICAL BUGS ------------------------------------------
+
+- column reorder puts sort arrow in wrong place
+- dragging a column should not cause a sort to start
+- itemguitable should only restore selection state when asked to
+
+------ IN PROGRESS (jeske) ------------------------------------
+
+- column appearance tab
+  - heading title
+  - sizing behavior
+  - alignment
+  - heading icon
+  
+
+------ Alpha-1 (3/10!) --------------------------------------------
+
+features:
+- change object serialization to XML (w/version)
+- safeguard originally authored data
+
+- (done) "From" contact display/edit minitool
+- "create" contact mini-tool
+- contact recent messages (subj) minitool
+- related addrs w/hoverover contact minitool
+
+- customize column header icon/size
+
+- hookup toolbar buttons (compose, Sync, reply)
+- sync should also pull down message contents (so it is indexed)
+
+- basic Contacts GUI to show related email
+
+- better sync status feedback
+
+bugs:
+- imap sync breaks in the middle without completing
+- fieldname hover popups get left around
+
+- out of memory error w/text index & rb turned on
+- deadlock/lockup
+
+- rbManager does not run on first app start
+- re-adding the same imap server does not work (i.e. it finds
+  existing folders and does not create new ones, should use
+  item.getItem())
+- folder should remember the colset selected on that folder
+- solition for the "AbsoluteLayout" problem (i.e. it's a netbeans class)
+- resoring saved item selection does not work right
+- clicking on item in calendar list should goto that day
+- initial searchbox size
+- new account should be a non-modal dialog
+- calendar GUI should show #Date in colconfig, not "Date"
+
+- RDF import did not update JTable immediately (due to initially
+  empty colconfig?)
+
+
+check:
+- (fixed?) imap message parent bugs 
+- (fixed?) keyboard nav in folder throws cast exceptions during imap sync
+
+
+------ Alpha-2 ------------------------------------------------
+
+features:
+- make itemInspector use ItemGUIDocument (itemguidocument
+  will need to clone new content view)
+
+- "startup wizard" to:
+  - pick repository location (save as pref)
+  - start new account wizard
+- all items should have "Summary"
+- support attachment display/open in ItemGUIEmailMessage
+- new "separate" debug tool (i.e. log to a file using 
+  java logging API, and then write a separate application which
+  watches and displays logfiles WITHOUT having to keep all logs in
+  memory all the time.)
+- highlight backgroud of sorted table column (i.e. like WinXP)
+- add html "welcome" page
+- search tool should auto-select results and have "clear" button
+- method to rebuild GUI
+- build thread relations
+- user defined 'categories' (w/pattern) (status,project,topic)
+- record changes and push back to imap
+  - leave deleted items in the view until "purge"/"update"
+- background sorting
+- better contact GUI
+- hover over contacts list brings up contact mini-view
+- tear off mini views
+  
+bugs:
+- creating a new columnset should:
+  - prompt for columnset name
+  - copy the current column set
+  - select the new column set
+  - open the customize dialog
+- clicking on folder in tree is sluggish
+- column iconset editor
+- #Date columns should default to "Date" formatter
+- stop relation builders from running on "all" objects/changes
+- deleting an item in tree should unselect it from ItemGUIDocument
+  (should either select root node, or previously selected node)
+
+------ Alpha-3 -----------------------------------------------
+
+features:
+- treetable w/threads
+- window status bar
+  - number of background threads
+  - information about current "document"
+- better "offline" support
+- table row appearance
+  - default (font,color,background color)
+  - multiple configurations triggered by data
+    - bold when unread
+    - background colors by Contact record group
+- derived data fields registry
+  - compatibility by: datatype or specific fieldids
+  - Ex: From Name/Email, AddressedTo, FromContact?
+  - Special "FlagSelection" which stores it's own data used
+    for checkboxes and message flagging
+- ItemGUISelector for lower-left corner pane selection 
+  - consider building into MultiView as configuration option
+
+    
+------ Places to put things (before modules)  -----------------
+
+ItemGUIDocument viewer selector:
+  - right click to get a list of GUI viewers
+  - remember the viewer used for a given type
+Client to client sync:
+  - "ItemP2PSync"
+    - every instance will have a generated GUID server ID
+      (just pick a random number for now) 
+    - uses "P2PSyncChannel" (email,http,raw) to establish
+      an initial connection
+    - contains a set of "ItemP2PSyncSpec" which point 
+      to objects which should be shared. A pointer can either
+      be an "individual oid" or an "oid:relation" for all objects
+      in a relation. The syncspec will also contain read/write
+      policy information. Initially just read-only or read-write,
+      eventually it might have "field visibilty" or "lease status"
+      for getting a "write lease" on an object.
+    - contains a list of objects which have changed since the
+      last sync which is updated by "ItemRBP2PSync"
+    - "ItemRBP2PSync" relation builder which is registered with 
+      relation builder and (a) checks to see if the changed 
+      object is listed in an ItemP2PSyncSpec
+      (b) if it is, adds it to the list of objects which need
+      to be synchronized out to that client when the
+      sync occurs. (eventually it should have smaller granularity
+      but for now whole objects is fine)
+    - "ItemP2PSync" should have a "sync" action which bottles up
+      the list of changed objects and ships it off to the remote
+      instance. When objects are received, they should be created
+      with an "owner" reference to the P2PSync channel, and a
+      "ownerInstance" field pointing to the instance GUID, and 
+      an "ownerOID" field recording the owner OID. The object
+      "name" should be the combination of those two for now.
+    - ItemGUITable's configure pulldown menu should have a 
+      "share items..." entry which brings up a sharing dialog to
+      configure who to share the items with.
+      
+    - (Maybe) Every item should have a "share" action 
+      (pulldown menu action). This would bring up a sharing 
+      dialog which will let you choose (a)the item or a 
+      particular relation of the item, (b) a P2PSync 
+      instance, (c) permissions -- and it should then 
+      create the ItemP2PSyncSpec record as appropriate. [[The
+      danger of this is that you are not seeing the items
+      you are about to share. One way to fix this might be to
+      make is so that you can only share the items viewed by
+      the "viewed_item_relation" which will be displayed
+      when you click on the item, although I don't know how
+      we would do that. - jeske ]]
+    
+  
+Display Filters/Incorporation Filters
+  - remove messages below a certain score
+  - remove messages from a certain author
+  - search for something in relation contents
+  - http://www.mozilla.org/projects/grendel/filters.html
+
+------ TASKS (before modules) --------------------------------
+
+Email Compose:
+- support plain or html composition
+- support attachments (DnD or chooser)
+- save as draft
+- send by creating ItemEmailMessage object and putting in
+  "outbound" relation somewhere
+- email address completion (based on contact records)
+- edit all headers dialog
+- compose window menu 
+   File->Save,Send
+   Edit->Copy, Paste
+   View->Options, Header Fields
+   Insert->File,Item,Signature,Picture,Hyperlink
+   Format->Plain,HTML,Style,Font,Paragraph,Encoding,
+       Background
+   Tools->Spelling, Address Book, Customize
+- primary toolbar items (send, save draft, attach) 
+- secondary toolbar items (importance high, flag for 
+  followup, options - see outlook, address book,
+  check names)
+- formatting toolbar items (Plain/Html,Font,F-Size,etc.)
+
+Toolbar/Menubar/Actions:
+- toolbar sections which disappear when out of
+  context (i.e. reply/forward toolbar disappear when
+  email folder viewer not visible)
+- different toolbars/menubars for different windows!
+- toolbar buttons which disable when out of context
+  (i.e. reply disable when no message selected or
+        key focus lost - see Outlook)
+- "button arrow menu" for "New" button
+- toolbar button configuration
+- (done: 2/14) add toolbar/menubar
+
+Toolbar Idea 2:
+- each GUI component can register one toolbar, with a configurable set of buttons
+- ItemGUIDocument registers a configurable toolbar, and switches out the contents
+  based on the currently displayed document. (How to make overflow items work? 
+  Proxy Toolbar?)
+
+Toolbar Ideas 1:
+- cascade toolbar population down through GUI
+- show all toolbars during "unlocked" mode
+- ItemGUI isVisible -> false should hide toolbars
+  and ItemGUI isVisible -> true should show toolbars
+- ItemGUIDocument should have outlook folder bar
+  - this folder bar should have "gui chooser",
+    "action chooser", etc..
+- ItemGUI should have a "save context" which it
+  finds by walking up the tree. ItemGUIFrame will
+  provide the default save context. ItemGUIDocument
+  will provide a save context which uses both the
+  viewed item and the "url". 
+  - items which are saved should be named well.
+  - a configuration UI would allow the user to
+    determine how and where something is saved.
+    For example, "Scrollbar position" would be
+    saved to the folder every time it was changed.
+    However, the splitter position would only be
+    saved when the user clicked a "save views"
+    button.
+
+
+- look at:
+   http://www2.creo.com/sixdegrees/
+
+Column Config: 
+- set column alignment/size
+- set column header title/icon
+- let user build new regex based formatters
+- set editable state for fields
+- add "define column" which is basically "define field"
+- build enum based field entry for editable fields
+- derived columns registered by item type
+  - email "summary" should combine subject,size,etc.
+  - derived column so it can be changed later!
+- (done: 2/11) configure date formatter for column
+- (done: 2/12) set formatter for column
+
+Small Items:
+- build a way to destroy and recreate only the GUI
+- email status column header should have image title
+
+Organize Sync Process:
+- single "send/receive" button to trigger sync
+- progress bar for each sync conduit.
+- toolbar sync "advanced" arrow for selecting
+  what to sync specifically.
+
+Background Thread Manager:
+- Show moving status icons when "foreground"
+  threads are running, such as fetching or rendering
+  an email message, IMAP sync, etc.
+- separate display for "background" threads such as
+  relationship building, text indexing, and other non-user
+  initiated tasks.
+- display progress for threads (i.e. "40/2342", or progress bar)
+- windows idle monitor: so we can run "background" threads 
+  only when machine is idle... possible just mouse movement
+
+Database:
+- (done) fields should be in the tree
+- objects should point to a "type object" (instantiation type,
+  plus data subtype)
+- type objects should point to fields they define
+- fields should always be defined in terms of a type
+  object (i.e. schema)
+
+
+
+Categories:
+- file messages in categories (possibly multiple categories)
+- filter view to only messages in a category (drag and drop
+  on filter bar)
+- add category (list) to columns
+- automatically categorize based on text-matching relation
+  builder.
+
+Keyboard Accelerators:
+- accerators should be in or out of context 
+  similar to toolbars
+
+------ TASK: MODULES -----------------------------------------
+
+Extensibility/Modules:
+- a module should encapsulate and contain:
+  - the datatype schema (Item types and their valid fields)
+  - the code functionality for the module
+  - GUI views/icons available to render these and other objects
+  - Actions available on the module, Items, or GUI panes for
+    use in (a) adding to toolbars, (b) making keybindings, etc.
+  - Default setups and keybindings which can be easily added
+    to a user's existing installation at initial module load,
+    and easily removed later.
+- assertions and data-validity checks for app/module interfaces
+- sandboxing
+
+------ TASKS (independent of modules) -------------------------
+
+Calendar:
+- create/setup "ItemGUICalendarDay" and put in a MultiView panel
+- create "overlay selection pane". This should let one choose
+  from a set of different overlays of items. For example,
+  "Movies" and "Personal" and "Email" would be different
+  overlay items. Right clicking on an item in the overlay list
+  should include a Property panel which would allow you to
+  set settings such as the color and font of those overlay
+  items.
+- dates in matchers need to find CLOSEST date, biased
+  towards the future, NOT the date in the current year.
+  I.e. "Jan 2" matched on Dec 10th 2002 should be
+  Jan 2 2003, NOT 2002.
+
+MultiView GUI Component:
+- multiview mode for displaying several 
+  derived items (i.e. from email message, follow
+  email:addr->addr:contact and then display
+  each contact record in a multiview collapsepane,
+  with a title related to how the contact was
+  made)
+  
+
+Sorting Improvements:
+- sorting should happen in the background
+- while sorting, make a progress "bounce bar" 
+  in the header.
+- flash header bad on initial click for feedback
+- flash header bar on completion, 1/4 second before
+  we switch the display to the new sorted version
+  to give the user warning
+- maybe add a hoverover popup w/progress bar
+
+Search:
+- search toolbar should have (a) text field, 
+  (b) search current button, (c) search all
+  button, (d) clear search button.
+- searching should switch the view
+- "generic" search results UI using "Summary"
+- enter/alt-enter should map to search buttons
+- ESC should map to clear search when in search
+  results pane, and go back to where you came from
+
+DB speedup/fixes:
+- write custom serialization/unserialization
+  for simpleitemstorage so it is not subject to
+  class changes.
+- (done) convert sleepycat db access to transactions
+- print the elapsed time of a checkpoint to debug window
+- need to add a computed "summary" field to all item types
+- weak reference the item data so it can be independently
+  freed.
+- pre-stored sort orders/filters
+
+UI Responsiveness:
+- initial window open delay comes from loading disk
+  based objects during window show. Build a prefetch
+  stage. (i.e. have it render to a buffer or something)
+- make message MIMEdecode & Render happen in the
+  background.
+- compose "matching" should be in background thread
+
+
+------ BUGS ---------------------------------------
+
+
+- windows default font is really bad, set to Arial 11pt
+- mv does not show on initial gui build
+  - multiview/splitpane should watch itemchange events
+    for their own item data. (i.e. when you add
+    a new view to a multiview or splitpane, it should
+    really add the view)
+- item does not stay selected on table data update
+  when sorted
+- JTable has white vertical lines between columns, remove them
+- column size save does not work
+- shutdown is not totally clean
+- column config dialog on new column config dosn't work right
+- column config for default viewer should be specific to item 
+  (or item "subtype") not GUI
+- switching between folders should not require so many
+  object saves
+- fetching data from an IMAP connection that was open
+  but has timed out throws exception (should checkConnected()
+  and Connect() if necessary)
+
+- (done) windows L&F has extra inset borders around things, remove 
+- (done) fix tree model threading and notifications (delete is broken!)
+- (done) menu does not show on initial gui build
+- (done) small/fixed column sizes don't properly save/keep
+
+
+----- SEPARABLE SUBPROJECTS -----------------------
+
+- Outlook style sidebar
+- VS.NET style property editor panel w/categories
+
+Contacts UI Prototype:
+  - simple "contact card" GUI w/edit in place
+  - show all cards in scrolling list (see outlook)
+  - need mechanism for linking email address/company
+  - showing related items
+  - use "contact card" in email ui
+  - add "notes" field
+- calendar GUI components
+  - need: GUI mockups and API description
+    - calendar model
+    - calendar overlay selection/model
+    - toolbar actions
+    - mockup: month, week, day views
+    - mockup: calendar "timeline" (outlook journal)
+- advanced JTable
+  - section expand (see outlook)
+  - TreeTable
+- XP L&F Manager
+  - get rid of "double border" present in standard L&F
+    around tables and trees in scrollers.
+  - XP Scrollbars
+  - XP Menu
+    - proper menu background color
+    - Dark invert rollover highlight
+    - white menu w/icons
+    - separator lines
+    - alpha drop shadow (when lightweight panel)
+  - XP JTable Feel 
+    - column horizontal border tick (not full vertical height)
+    - sorted column select
+      - background gray column
+      - orange strip on bottom of column header
+    - XP style alpha column drag
+    - right click on column to customize table
+    - no top border on table
+  - XP TreeTable
+    - same as above
+    - alpha drag-select box
+    - icon to the left of text in Name field
+    - click to select only selects name (like in tree) not row 
+    
+    
+------ PROTOCOLS ------------------------------------------------
+
+- TODO: NNTP, IM(AIM,YIM,ICQ,Jabber,Dave-IM), MS-FreeBusy, MAPI
+- TODO APPS: Salesforce, Trakken, SiebelCRM, OracleCRM, 
+       OracleCorporateTime, PalmDesktop/Palm, 
+        
+- Done: IMAP, POP, SMTP, iCal, RSS, YahooIntellisync
+
+------ LATER ----------------------------------------------------
+
+Notification Engine:
+- incremental xpath scheme for registering notifications
+- should store sort order on disk for large lists
+
+
+New Email Header Expansion:
+- min: display a subset of delivery headers
+       to conserve space. Header is above 
+       scrollable email display. Hoverover
+       CC will show all entries.
+       
+- max: display ALL headers. Email Headers
+       and email body should be in a single
+       scrollpane.
+
+todo:
+- multidimensional outliner based on TreeTable
+  - Dave Winer "MORE"
+  - OMNIOutliner
+  - OPML: http://www.opml.org/
+- calendar event which creates a todo item
+- todo items without due dates
+- "postpone" button to put something off for a week and bring it back
+- "eventually" for far off projects
+- email followup ...
+- expect email reply ...
+
+Other Applications:
+- workflow (bugtracking, resume/jobs, document review/publish)
+
+Relate To?
+- ItemPossibleRelation
+- should show up in "multi-panel" on the right
+  of an email message, and ask the question:
+  "Should this be related to one of these entries?"
+  For example, should the email record be related
+  to one of the following contact records, or a 
+  new one?
+
+Calendar Ideas:
+- useful post about iCal, CAP, and Calendar Standards:
+  http://lists.osafoundation.org/pipermail/design/2003-January/001677.html
+- figure out how to allow a user to add images of moon phases
+  or tides from a weatherunderground module
+- select text and "send to calendar", for example,
+  in the email it would include a list of events like:
+
+   Thurs Jan 30 - meet with the parents day
+   Tues  Feb 2 - science fair
+
+  The user would manually select the first line, and 
+  right-click to "send to calendar". Alternatively,
+  the context popup could come up because he selected 
+  the text.
+- Download "Corporate Time" client as a UI reference:
+  http://software.wm.edu/win-emailcomm.html
+- ?? Support Oracle CorporateTime server sync (formerly
+  Netscape Calendar Server, and Google uses this).
+   http://www.steltor.com/documentation/
+- UI Ideas here:
+    http://www.webevent.com/
+
+Sync Sources:
+- Bugzilla
+- Trakken Issues
+- Trakken KB
+
+Random Ideas:
+- sticky notes which you can add to any item and which display
+  when that item is displayed. (how do they get shown/hidden
+  in the UI? ItemGUI show/hide notification? Does this mean
+  DefaultItem needs to have some kind of aggregation/category
+  loading for extension of item capabilities?)
+- store "all" data on an IMAP server in some hacky format
+  (IMAP backing store)
+- outlook/evolution summary page
+
+Other Tools:
+- multi-user "rating" system for rating anything from webpages
+  to plugin modules
+- bitzi.com plugin (bitstream content identification)
+
+IMAP/Email:
+- automatic conversion of attachments (Word, PDF, Excel) to text
+  or html for (a) text-indexing, (b) simple inline display
+- make it easy to add email response templates/signatures via macros
+- easily setup "followup", or "expected reply" alarms when composing
+  (ex. I send out asking for a dinner time confirmation, or for an
+    update on a work project. If I don't receive a reply in X days
+    then I need this item to flip up in my inbox as high priority.)
+- support "bounce to" message w/ resent-to header
+- support outgoing smtp login/auth
+- support PGP/SMIME for signing and encryption
+  - could create a secure email service which would:
+    - verify addresses/keys (email round-trip?)
+    - offer on the web SSL delivery for clients without
+      smime support
+- configurable automatic compression of uncompressed attachments
+  in outgoing messages. (i.e. compress BMP, EXE, etc, using ZIP
+  on windows)
+- make method to control email content display settings (i.e.
+  display as text/plain, text/html)
+- popup notifications dialog should notify about multiple events
+  in a single window (to avoid window pileup when you're gone)
+- notification of the ending of a recurring event
+- tagging of messages (different from multiple select)
+
+GUI Build:
+- make "unlock ui" concept 
+
+Other:
+- Outlook Integration (sync w/Outlook via COM, display embedded
+  tool via Outlook Folder Home Page and Java Applet)
+  (use tool to generate Outlook/COM bindings for Java)
+- IE toolbar to display and create wm entries related to webpages
+- NNTP sync/browse
+  - automatically flag replies to my own posts as high priority
+    and optionally deliver them to my inbox.
+- group messages into vfolders based on the address book entries
+  (i.e. Neotonic, Friends, Other)
+- support easily linking data to external webpages. For example,
+  if I'm reading an email and want to make it part of my Wiki,
+  it should be really easy for me to link the email to the wiki.
+- user extensable fields (even on read-only items, such as email
+  messages). This requires distinguishing between field types,
+  i.e. Mail/* == read/only. A use case would be putting a "status"
+  or "note" on email messages so I can can scribble.
+- automatic exception/bug reporting (ala Mozilla)
+- initial user setup should include a "locale" choice, which
+  would setup, among other things, the date format for the user
+  which all components will use. (YYYYMMDD or DDMMYYY)
+- look at MSProject for date configuration and entry
+
+alanb vm config:
+- toggle forward as attachment vs forward inline
+- choose different .sigs from compose (pulldown)
+- choose different From: identities from compose (pulldown)
+- auto choose identity based on identity of reply/folder/etc.
+- report spam to VIPUL (spam button)
+- headers to view regex
+- edit any header from compose
+- rfc822 mime digest
+- default "save to" patterns
+- virtual folders "V", then "C", then (header) then match
+
+
+
+
+------ DEMOS -------------------------------------------------
+
+ - video of building a relation
+ - video of email composition relation building
+ - display email on a calendar
+ - display several RDF feeds interspersed
+   - mono-list
+   - dave berry
+   - slashdot
+ - display RDF data on a calendar
+
+------ REFERENCES --------------------------------------------
+
+- This tool allows you to visually build named graphs:
+
+   http://www.ideagraph.net/2002-12/tutorial/ideagraphs.htm
+
+- Literary Machine - really neat ideas
+
+   http://www.sommestad.com/LM_1_1.htm
+   
+- Tinderbox hypertext personal notes (more neat ideas)
+
+   http://www.eastgate.com/Tinderbox/Profiles/Fultz.html
+
+------- INFO ----------------------------------------------
+
+1) How to use Threads
+ 
+  http://java.sun.com/docs/books/tutorial/uiswing/misc/threads.html
+ 
+2) How to use Timers
+
+  http://java.sun.com/docs/books/tutorial/uiswing/misc/timer.html
+
+3) Cwikla says this JVM is faster:
+
+  http://www.bea.com/products/weblogic/jrockit/index.shtml
+
+4) some LGPL code:
+
+  http://www.cogsci.ed.ac.uk/~dmck/MateCode/
+  
+5) HTML Threading Standard
+  http://www.w3.org/TR/1998/NOTE-HTMLThreading-0105
+  
+6) Format: Flowed
+
+  
+7) Outliners
+
+   http://www.outliners.com/
+   
+8) Installers
+   
+   http://nsis.sourceforge.net/
+
+9) Filters
+
+   http://www.mozilla.org/projects/grendel/filters.html
+   
+10) Java Logging Framework
+
+   http://java.sun.com/j2se/1.4.1/docs/guide/util/logging/overview.html
+   http://java.sun.com/j2se/1.4/docs/api/java/util/logging/LogRecord.html
+
+11) TMDA - tagged message delivery logging
+
+   http://tmda.net/
+
+------- ALPHA testers ------------------------------------
+
+Ben Gross (IMAP:MacOS X,Win2k,WinXP,Linux)
+Alan Braverman (Linux-IMAP)
+Scott Hassan (Linux-mbox, Win2k-mbox)
+David Jeske (Win2k-IMAP)
+Brandon Long (WinXP-IMAP)
+Carl Page (Win2k-IMAP)
+Patrick Phalen (Linux-mbox)
+
+------- PEOPLE to demo to --------------------------------
+
+1) Kaitlin Duck Sherwood 
+
+   Chandler Wiki Administrator
+
+2) Rich Hamper
+
+   Introduced Literary Machine, still uses Lotus Agenda
+   http://lists.osafoundation.org/pipermail/design/2003-February/001965.html
+   
+------- Evangalists ---------------------------------------
+   
+3) John Udell
+
+   http://weblog.infoworld.com/udell/

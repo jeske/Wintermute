@@ -1,0 +1,28 @@
+
+--- Materials ---
+  
+  * Name ???
+
+  * Simple website
+  * flash presentation introducing neat features
+
+--- Advantages Over existing tools ---
+
+  * Responsive (threaded UI never locks up)
+  * Fast Text Search over all items
+  * powerful calendar overlays
+  * Peer-to-Peer sync, even over email
+  * easily extensible
+
+
+--- Possible Evangelists ---
+
+Dave Winer (weblogs, likes Outlining)
+Kaitlin Duck Sherwood (two books on email overload)
+Mitch Kapor (Chandler)
+Eric Schmidt (interested in non-MS technologies)
+
+--- Possible Investors/Supporters ---
+
+Sun (Java posterchild, MS Outlook competitor)
+Oracle (client for it's growing Collaboration Suite, anti-MS)

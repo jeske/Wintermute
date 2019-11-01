@@ -1,0 +1,51 @@
+
+         WinterMute Beta Software License
+
+This is an early-access BETA release of the Wintermute
+
+PLEASE READ THIS SOFTARE LICENSE AGREEMENT ("LICENSE")
+CAREFULLY BEFORE INSTALLING THIS SOFTWARE. YOU ARE
+AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE. IF
+YOU DO NOT AGREE TO THE TERMS OF THIS LICENSE, DO NOT
+INSTALL THE SOFTWARE.
+
+1. License. The software and any associated media files 
+accompanying this License ("WinterMute BETA") are licensed,
+not sold to you by DaveResearch. WinterMute and any
+copies made and/or distributed under this License are
+subject to this License.
+
+2. Permitted Uses and Restrictions. This License allows
+you to install and use WinterMute BETA for internal
+testing purposes only. You are not allowed to distibute
+any part of WinterMute BETA to any party for any reason.
+Your rights under this License will terminate automatically
+without notice from DaveResearch if you fail to comply
+with any term(s) of this License.
+
+3. Disclaimer of Warranty on DaveResearch. You expressly
+acknowledge and agree that use of WinterMute BETA is
+at your sole risk. WinterMute BETA is provided "AS IS" and
+without warranty of any kind and DaveResearch EXPRESSLY
+DISCLAIMS ALL WARRANTIES AND/OR CONDITIONS, EXPRESS OR
+IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+AND/OR CONDITIONS OF MERCHANTABILITY OR SATISFACTORY
+QUALITY AND FITNESS FOR A PARTICULAR PURPOSE NONINFRINGEMENT
+OF THIRD PARTY RIGHTS. DAVERESEARCH DOES NOT WARRANT THAT
+THE FUNCTIONS CONTAINED IN WINTERMUTE BETA WILL MEET YOUR
+REQUIREMENTS, OR THAT OPERATION OF WINTERMUTE BETA WILL BE
+UNINTERRUPTED OR ERROR-FREE, OR THAT DEFECTS IN WINTERMUTE BETA
+WILL BE CORRECTED. FURTHERMORE, DAVERESEARCH DOES NOT WARRANT
+OR MAKE ANY REPRESENTATIONS REGARDING THE USE OR THE RESULTS 
+OF THE USE OF WINTERMUTE BETA OR RELATED MATERIALS IN TERMS OF
+THEIR CORRECTNESS, ACCURACY, RELIABILITY, OR OTHERWISE.
+
+4. Limitation of Liability. UNDER NO CIRCUMSTANCES, INCLUDING
+NEGLIGENCE, SHALL DAVERESEARCH BE LIABLE FOR ANY INCIDENTAL,
+SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR
+RELATING TO THIS LICENSE. SOME JURISDICTIONS DO NOT ALLOW THE
+LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES SO THIS
+LIMITATIONS MAY NOT APPLY TO YOU. In no event shall 
+DaveResearch's total liability to you for all damages exceed 
+the amount paid for WinterMute BETA, or fifty dollars ($50.00),
+whichever is less.

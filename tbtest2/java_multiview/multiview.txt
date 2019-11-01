@@ -1,0 +1,118 @@
+Java Swing MultiView
+
+The deliverable for this project is the Java source for a set of classes needed to implement a Java Swing UI MultiView Component. This will "look and feel" significantly like the Windows XP "Folder Tasks" pane 
+
+(see attached files and screenshots). 
+
+Here is a more detailed description of the functionality for each:
+
+- The MultiView contains several named "subviews" which can be
+  collapsed or expanded. With animation for collapse/expand or
+  subview size changes.
+
+- These subviews are stacked vertically, and aligned on the top. 
+
+- Each subview should have a titlebar.
+
+- The titlebar should have rounded top corners and an icon on the 
+  right to indicate expand state (a GIF image which toggles to 
+  expanded or non-expanded state - graphic design of the GIF is 
+  not necessary, just borrow from the screenshots)
+
+- The titlebar background color should support a color gradient
+  just like in the attached screenshots. (the gradient will be
+  explicitly set)
+
+- When a subview is collapsed, only the titlebar should display.
+
+- Clicking on the titlebar should cause the subview to toggle it's
+  expand/collapse state.
+
+- The subviews should be forced to assume the width of the MultiView
+
+- There should be animation for the following: (a) collapse/expand 
+  of a subview, (b) subview size change, (c) subview addition/removal
+
+- It should be possible to disable the animation, or just disable
+  the alpha blending in the animation (see below)
+
+- I know alpha transparency is possible but not trivial in Java.
+  It would be acceptable to omit Alpha support if EVERYTHING else
+  was done perfectly.
+
+* Animation Details
+
+- When a subview collapse is requested, the subview content should 
+  simultaneously (a) slide up "into" the title bar for that
+  subview, and (b) fade out using alpha transparency. The
+  opposite operation should happen when it is expanded. 
+  (see the behavior of the XP "Folder Tasks" pane)
+
+- When a subview changes it's height, the border of the subview
+  region should not immediately change to match. It should animate
+  to match the subview height change. The location of the subviews
+  below will adjust with the animation.
+
+- When a subview is added while the MultiView is displayed, it
+  should slide into place from off the MultiView (to the left or 
+  right). Simultaneously, the other subviews should animate to 
+  make room for the new subview (if it is not attaching at the bottom).
+
+  For example, in the screenshot "mutlview_ex2.gif", if a new subview
+  "Stuff" was added between "System Tasks" and "Other Places", 
+  two things would animate simultaneously. The "Other Places" and
+  "Details" subviews would slide down to make room for the new 
+  subview. The "Stuff" subview would begin to become visible by sliding
+  in "from the left edge. 
+
+- MultiView "insert popup animation"
+
+  In some cases, we're going to already have a popup displayed
+  elsewhere (probably a collapsable subview). I'd like to be
+  able to request this popup be added to the MultiView, and
+  have an animation which occurs from where the popup ALREADY  
+  IS on the screen. 
+
+  Just like the above slide in animation, the existing subviews
+  in the multiview will slide down to make room for the insertion
+  point of the new subview.
+
+  Simultaneously, the popup window will slide from where it 
+  ALREADY IS to land in the gap made by the multiview. While it's
+  sliding, the width of the popup will adjust so that it will
+  match the width of the multiview when it lands there. When the 
+  width changes, it's likely that the height will change because
+  of flowed text (use an HTML EditorPane to test). When the
+  popup reaches it's destination, the MultiView should make that
+  EXISTING subview part of itself and destroy the popup 
+  which contained it. 
+
+  This action is intended to make a seamless animation where an
+  existing popup window will slide over to the multiview and dock
+  into it.
+
+* Implementation Details 
+
+- The subcomponents should be separate, and as simple as possible.
+  Standard classes and layouts should be used whenever possible.
+
+- The collapsable panel with titlebar should be a standard
+  component that I can also add to a popup window. 
+
+- The multivew should be capable of containing items other than
+  the collapsable subview (any JComponent).
+
+- One POSSIBLE implementation would be to make these 
+  subcomponents:
+
+   1) CollapsablePanel extends JPanel or JComponent
+      - manages the animation and visibility for the
+        subview collapse/expand/resize
+   2) GradientTitleBar extends JPanel or JComponent
+      - draws the title bar with color gradient,
+        rounded corners, and collapse/expand buttons
+   2) MultiViewPanel or MultiViewLayout
+      - manages the stacking of the panels, including
+        the "addPanel" animation.
+      - manages the "insert popup" animation
+  
